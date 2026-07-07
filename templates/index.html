@@ -1,0 +1,303 @@
+{% extends "base.html" %}
+
+{% block title %}Generador de QR | Dashboard{% endblock %}
+
+{% block content %}
+
+<section class="hero-section" id="generator">
+    <div class="hero-copy">
+        <p class="eyebrow">Plataforma de Inteligencia QR</p>
+
+        <h1>
+            Generador Inteligente de Códigos QR
+        </h1>
+
+        <p class="hero-description">
+            Crea códigos QR profesionales con enlaces cortos.
+        </p>
+    </div>
+
+    <div class="stats-strip" id="analytics">
+        <div class="stat-pill">
+            <span>Total QR</span>
+            <strong>{{ total_links }}</strong>
+        </div>
+
+        <div class="stat-pill">
+            <span>Total usos</span>
+            <strong>{{ total_scans }}</strong>
+        </div>
+
+        <div class="stat-pill">
+            <span>Más usado</span>
+            <strong>
+                {% if most_used %}
+                    {{ most_used["scans"] }}
+                {% else %}
+                    0
+                {% endif %}
+            </strong>
+        </div>
+    </div>
+</section>
+
+<section class="generator-grid">
+    <article class="panel generator-panel">
+        <div class="panel-header">
+            <div>
+                <span class="section-label">QR Setup</span>
+                <h2>Crear nuevo QR</h2>
+            </div>
+
+            <span class="badge">Dinamico</span>
+        </div>
+
+        <form action="{{ url_for('main.create_link') }}" method="POST" class="qr-form">
+            <div class="input-group">
+                <label for="title">Título</label>
+                <input 
+                    id="title"
+                    type="text" 
+                    name="title" 
+                    placeholder="Ejemplo: Invitación graduación"
+                >
+            </div>
+
+            <div class="input-group">
+                <label for="original_url">URL destino</label>
+                <input 
+                    id="original_url"
+                    type="url" 
+                    name="original_url" 
+                    placeholder="https://ejemplo.com"
+                    required
+                >
+            </div>
+
+            <button type="submit" class="primary-button">
+                <span>▦</span>
+                Generar codigo QR
+            </button>
+        </form>
+    </article>
+
+    <article class="panel preview-panel">
+        <div class="preview-card">
+            {% if links %}
+                {% set latest = links[0] %}
+                {% set latest_url = base_url + url_for('qr.short_redirect', code=latest['code']) %}
+
+                <div class="qr-frame">
+                    <img 
+                        src="{{ url_for('qr.qr_image', code=latest['code']) }}" 
+                        alt="QR generado"
+                    >
+                </div>
+
+                <h3>{{ latest["title"] or "QR sin título" }}</h3>
+
+                <p class="short-code">
+                    {{ latest_url }}
+                </p>
+
+                <div class="mini-actions">
+                    <a href="{{ url_for('qr.download_qr', code=latest['code']) }}">
+                        ⬇ Descargar
+                    </a>
+
+                    <button 
+                        type="button"
+                        class="copy-button" 
+                        data-copy="{{ latest_url }}"
+                    >
+                        ⧉ Copiar
+                    </button>
+                </div>
+            {% else %}
+                <div class="empty-preview">
+                    <div class="empty-icon">▦</div>
+                    <h3>Vista previa</h3>
+                    <p>Cuando generes tu primer QR aparecerá aquí.</p>
+                </div>
+            {% endif %}
+        </div>
+    </article>
+</section>
+
+<section class="activity-section" id="history">
+    <div class="section-heading">
+        <div>
+            <h2>Actividad reciente</h2>
+            <p>Tus códigos generados y su rendimiento.</p>
+        </div>
+
+        <a href="#full-history">Ver Historial Completo →</a>
+    </div>
+
+    {% if links %}
+        <div class="activity-grid">
+            {% for link in links[:3] %}
+                {% set short_url = base_url + url_for('qr.short_redirect', code=link['code']) %}
+
+                <article class="activity-card">
+                    <div class="activity-top">
+                        <div class="activity-icon">▦</div>
+
+                        <div>
+                            <h3>{{ link["title"] or "Sin título" }}</h3>
+                            <p>{{ link["created_at"] }}</p>
+                        </div>
+
+                        <span class="status-badge">Activo</span>
+                    </div>
+
+                    <div class="metrics">
+                        <div>
+                            <span>Scans</span>
+                            <strong>{{ link["scans"] }}</strong>
+                        </div>
+
+                        <div>
+                            <span>Tipo</span>
+                            <strong>Dinamico</strong>
+                        </div>
+                    </div>
+
+                    <div class="card-actions">
+                        <a href="{{ url_for('qr.download_qr', code=link['code']) }}">
+                            Descargar
+                        </a>
+
+                        <a href="{{ url_for('stats.stats', code=link['code']) }}">
+                            Estadísticas
+                        </a>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <h3>No hay actividad reciente</h3>
+            <p>Crea tu primer QR para ver aquí el historial.</p>
+        </div>
+    {% endif %}
+</section>
+
+<section class="history-table-section" id="full-history">
+    <div class="section-heading">
+        <div>
+            <h2>Historial completo</h2>
+            <p>Todos los códigos QR generados.</p>
+        </div>
+    </div>
+
+    {% if links %}
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>QR</th>
+                        <th>Información</th>
+                        <th>Enlace corto</th>
+                        <th>Usos</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for link in links %}
+                        {% set short_url = base_url + url_for('qr.short_redirect', code=link['code']) %}
+
+                        <tr>
+                            <td>
+                                <div class="table-qr">
+                                    <img 
+                                        src="{{ url_for('qr.qr_image', code=link['code']) }}" 
+                                        alt="QR"
+                                    >
+                                </div>
+                            </td>
+
+                            <td>
+                                <strong>{{ link["title"] or "Sin título" }}</strong>
+
+                                <p class="muted clamp">
+                                    {{ link["original_url"] }}
+                                </p>
+
+                                <p class="muted">
+                                    Creado: {{ link["created_at"] }}
+                                </p>
+
+                                {% if link["last_scan_at"] %}
+                                    <p class="muted">
+                                        Último uso: {{ link["last_scan_at"] }}
+                                    </p>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <button 
+                                    type="button"
+                                    class="link-copy copy-button" 
+                                    data-copy="{{ short_url }}"
+                                >
+                                    {{ short_url }}
+                                </button>
+                            </td>
+
+                            <td>
+                                <span class="scan-count">{{ link["scans"] }}</span>
+                            </td>
+
+                            <td>
+                                <div class="table-actions">
+                                    <a href="{{ url_for('qr.download_qr', code=link['code']) }}">
+                                        Descargar
+                                    </a>
+
+                                    <a href="{{ url_for('stats.stats', code=link['code']) }}">
+                                        Estadísticas
+                                    </a>
+
+                                    <form 
+                                        action="{{ url_for('main.delete_link', code=link['code']) }}" 
+                                        method="POST"
+                                        onsubmit="return confirm('¿Eliminar este QR y sus estadísticas?');"
+                                    >
+                                        <button type="submit" class="danger-button">
+                                            Eliminar
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <h3>Aún no has creado ningún QR</h3>
+            <p>Usa el formulario principal para comenzar.</p>
+        </div>
+    {% endif %}
+</section>
+
+<section class="settings-section" id="settings">
+    <div class="cta-panel">
+        <h2>Listo para llevar a otro nivel tu link?</h2>
+
+        <p>
+            Con esta paguina puedes levar a otro nivel tu link.
+            Mejora la experiencia de tus usuarios y obtén estadísticas detalladas de cada QR generado.
+        </p>
+
+        <div class="cta-actions">
+            <a href="#generator" class="light-button">Crear otro QR</a>
+            <a href="#history" class="ghost-button">Ver historial</a>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

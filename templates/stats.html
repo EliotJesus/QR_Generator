@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Estadísticas QR{% endblock %}
+
+{% block content %}
+
+<section class="stats-page">
+    <a href="{{ url_for('main.index') }}" class="back-link">
+        ← Volver al dashboard
+    </a>
+
+    <div class="stats-hero">
+        <div>
+            <p class="eyebrow">QR Analytics</p>
+
+            <h1>
+                {{ link["title"] or "QR sin título" }}
+            </h1>
+
+            <p class="hero-description">
+                Consulta el rendimiento, enlace corto e historial de escaneos de este código QR.
+            </p>
+        </div>
+
+        <div class="qr-frame stats-qr">
+            <img 
+                src="{{ url_for('qr.qr_image', code=link['code']) }}" 
+                alt="QR"
+            >
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <article class="stat-card">
+            <span>Total de usos</span>
+            <strong>{{ link["scans"] }}</strong>
+        </article>
+
+        <article class="stat-card">
+            <span>Código corto</span>
+            <strong>{{ link["code"] }}</strong>
+        </article>
+
+        <article class="stat-card">
+            <span>Creado</span>
+            <strong>{{ link["created_at"] }}</strong>
+        </article>
+
+        <article class="stat-card">
+            <span>Último uso</span>
+            <strong>
+                {{ link["last_scan_at"] or "Sin registros" }}
+            </strong>
+        </article>
+    </div>
+
+    <section class="panel detail-panel">
+        <div class="panel-header">
+            <div>
+                <span class="section-label">Short URL</span>
+                <h2>Enlace corto</h2>
+            </div>
+        </div>
+
+        <div class="url-box">
+            <button 
+                type="button"
+                class="copy-button" 
+                data-copy="{{ short_url }}"
+            >
+                {{ short_url }}
+            </button>
+        </div>
+
+        <div class="url-box secondary-url">
+            <span>URL destino:</span>
+            <p>{{ link["original_url"] }}</p>
+        </div>
+    </section>
+
+    <section class="panel scans-panel">
+        <div class="panel-header">
+            <div>
+                <span class="section-label">Scan History</span>
+                <h2>Historial de escaneos</h2>
+            </div>
+
+            <span class="badge">{{ scans|length }} registros</span>
+        </div>
+
+        {% if scans %}
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>IP</th>
+                            <th>Dispositivo / Navegador</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for scan in scans %}
+                            <tr>
+                                <td>{{ scan["scanned_at"] }}</td>
+                                <td>{{ scan["ip"] }}</td>
+                                <td>
+                                    <p class="muted clamp">
+                                        {{ scan["user_agent"] }}
+                                    </p>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <h3>Este QR aún no tiene escaneos</h3>
+                <p>Cuando alguien abra el enlace corto, aparecerá aquí.</p>
+            </div>
+        {% endif %}
+    </section>
+</section>
+
+{% endblock %}

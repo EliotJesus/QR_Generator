@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+
+    <meta 
+        name="viewport" 
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>{% block title %}Generador de QR{% endblock %}</title>
+
+    <link 
+        rel="stylesheet" 
+        href="{{ url_for('static', filename='css/styles.css') }}"
+    >
+</head>
+
+<body>
+    <div class="app-bg">
+        <header class="navbar">
+            <a href="{{ url_for('main.index') }}" class="brand">
+                <span class="brand-icon">▣</span>
+                <span>Generar QR</span>
+            </a>
+
+            <nav class="nav-links">
+                <a href="{{ url_for('main.index') }}">Generador</a>
+                <a href="{{ url_for('main.index') }}#history">Historial</a>
+                <a href="{{ url_for('main.index') }}#analytics">Estadísticas</a>
+                <a href="{{ url_for('main.index') }}#settings">Configuración</a>
+            </nav>
+
+            <a href="{{ url_for('main.index') }}#generator" class="nav-button">
+                Iniciar QR
+            </a>
+        </header>
+
+        <main>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="toast-area">
+                        {% for category, message in messages %}
+                            <div class="toast {{ 'toast-error' if category == 'error' else 'toast-success' }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </main>
+
+        <footer class="footer">
+            <div>
+                <strong>EliotQR</strong>
+                <span>© 2026 Sistema de QR Minimalista</span>
+            </div>
+
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">API Docs</a>
+                <a href="#">Support</a>
+            </div>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
