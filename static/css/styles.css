@@ -947,3 +947,17 @@ tbody tr:hover {
 .profile-button:hover .avatar {
     border-color: rgba(18, 200, 232, 0.44);
 }
+.avatar {
+    display: grid;
+    width: 42px;
+    height: 42px;
+    place-items: center;
+    font-size: 12px;
+    font-weight: 900;
+    color: #dbeafe;
+    background:
+        linear-gradient(135deg, rgba(18, 200, 232, 0.24), rgba(114, 76, 255, 0.2)),
+        #101827;
+    border: 1px solid var(--line-strong);
+    border-radius: 50%;
+}
