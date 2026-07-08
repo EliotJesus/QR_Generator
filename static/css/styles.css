@@ -938,3 +938,12 @@ tbody tr:hover {
         right: 16px;
     }
 }
+.profile-button {
+    color: var(--text);
+    background: transparent;
+    cursor: pointer;
+}
+
+.profile-button:hover .avatar {
+    border-color: rgba(18, 200, 232, 0.44);
+}
