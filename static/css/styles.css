@@ -954,7 +954,6 @@ tbody tr:hover {
     transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
-/* Quita el subrayado normal del enlace */
 .profile-button,
 .profile-button:hover,
 .profile-button:focus,
@@ -962,7 +961,6 @@ tbody tr:hover {
     text-decoration: none;
 }
 
-/* Quita la línea animada que tienen los enlaces del menú */
 .nav-links .profile-button::after,
 .nav-links .profile-button:hover::after {
     display: none;
